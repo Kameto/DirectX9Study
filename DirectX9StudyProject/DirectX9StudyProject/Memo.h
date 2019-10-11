@@ -121,6 +121,127 @@ IDirect3D9インターフェースを取得するには、「Direct3Create9関数」を使う。
 ＜2.IDirect3DDevice9インターフェースの取得＞
 デバイスを作成するにはウィンドウハンドルが必要。
 なので、デバイスの作成はCreateWindowを行った直後に行う。
+*/
+
+/*
+＞＞デバイス作成簡易テンプレート＜＜
+D3DPRESENT_PARAMETERS g_D3DPP;// デバイスの動作を設定する構造体
+LPDIRECT3DDEVICE9 g_pD3DDevice;// デバイスのIDirect3DDevice9のインターフェース(IDirect3DDevice9* と LPDIRECT3DDEVICE9は同じ)
+
+// D3DPRESENT_PARAMETERS構造体の設定
+ZeroMemory(&g_D3DPP, sizeof(g_D3DPP));		// メモリ初期化
+g_D3DPP.Windowed = TRUE;					// ウィンドウモードを指定
+g_D3DPP.SwapEffect = D3DSWAPEFFECT_DISCARD;	// スワップエフェクト
+g_D3DPP.BackBufferFormat = D3DFMT_UNKOWN;	// バックバッファのフォーマット
+
+// IDirect3D9::CreateDeviceメソッドの実行
+HRESULT hr = g_D3DPP->CreateDevice
+			(
+				D3DADAPTER_DEFAULT,					// デフォルトディスプレイアダプタを指定
+				D3DDEVTYPE_HAL,						// HALデバイスで指定
+				hwnd,								// フォーカスするウィンドウを指定
+				D3DCREATE_SOFTWERE_VERTEXPROCESSING,// ソフトウェア頂点処理を指定
+				&g_D3DPP,							// LPDIRECT3DDEVICE9型にキャストされる(デバイスの設定を取得)
+				&g_pD3DDevice						// IDirect3DDevice9インターフェースを受け取る変数ポインタ
+			);
+
+if(FAILED(hr))
+{
+	return false;// IDirect3DDevice9インターフェースの取得に失敗
+}
+＞＞ーーーーーーーーーーーーーー＜＜
+*/
+
+/*
+// デバイスの作成
+HRESULT IDirect3D9::CreateDevice
+		(
+			UINT Adapter,				// ディスプレイアダプタの指定。 D3DADAPTER_DEFAULTを指定すると常にプライマリ・ディスプレイ・アダプタを指定できる
+			D3DEVTYPE DeviceType,		// デバイスタイプをD3DDEVTYPE列挙型で指定。
+			HWND fFocusWindow,			// このデバイスでフォーカスするウィンドウを指定。
+			DWORD BehaviorFlags,		// デバイス作成を制御するD3DCREATEフラグの組み合わせ。
+			pPresentationParameters,	// デバイスを設定するD3DPRESENT_PARAMETERS構造体のポインタ。
+			ppReturnedDeviceInterface,	// IDirect3DDevice9インターフェースを受け取る変数のポインタ。
+		);
 
 
+<<<D3DDEVTYPE列挙型>>>
+D3DDEVTYPE------------->D3DDEVTYPE_HAL
+			|			<∴>HAL1デバイス。ハードウェアによる処理を行う。
+			|
+			|
+			|---------->D3DDEVTYPE_REF
+			|			<∴>リファレンスラスタライザ。すべての機能がソフトウェアで正確に
+			|				実装されたデバイスだが、速度が遅い。基本的にデバッグ専用。
+			|
+			|
+			|---------->D3DDEVTYPE_SW
+						<∴>プラグ可能なソフトウェアデバイス。使用するソフトウェアデバイスは、
+							ユーザ側で用意して登録しなければならない。一般的なアプリケーションでは使われない。
+
+>>開発時には「D3DDEVTYPE_REFs」は有効だが、最終的には「D3DDEVTYPE_HAL」しか使わない。
+
+
+<<<D3DCREATEフラグ>>>
+D3DCREATE--------------->D3DCREATE_FPU_PRESERVE
+			|			<∴>アプリケーションで倍精度浮動小数点を使うことを指示。
+			|				パフォーマンスが低下する。
+			|
+			|----------->D3DCREATE_MULTITHREADED
+			|			<∴>マルチスレッドでの安全性を要求。
+			|				パフォーマンスが低下する。
+			|
+			|----------->D3DCREATE_PUREDEVICE
+			|			<∴>Direct3Dはドライバへの最適なパスを利用できる。
+			|				パフォーマンスが向上する。
+			|				一部を除いて「IDirect3DDevice9::Get系メソッド」の呼び出しが出来なくなり、
+			|				ハードウェアによる頂点処理だけになる。
+			|
+			|----------->D3DCREATE_HARDWERE_VERTEXPROCESSING
+			|			<∴>ハードウェアによる頂点処理を指定。
+			|
+			|
+			|----------->D3DCREATE_SOFTWERE_VERTEXPROCESSING
+			|			<∴>ソフトウェアによる頂点処理を指定。
+			|				制限なしのライト数や頂点シェーダ機能がソフトウェアで提供される。
+			|
+			|----------->D3DCREATE_MIXED_VERTEXPROCESSING
+						<∴>ミックス(ハードウェアとソフトウェアの両方)頂点処理を指定。
+
+>>>CreateDeviceメソッドでは少なくとも「」「」「」の
+>>>どれかを指定します。また、この３つのフラグは排他的にしか使えません。
+>>>なお、「ピュアデバイス」(D3DCREATE_PUREDEVICE)を使う場合は、
+>>>「D3DCREATE_HARDWERE_VERTEXPROCESSING」を指定しなければならない。
+
+
+<<<D3DPRESENT_PARAMETERS構造体>>>
+D3DPRESENT_PARAMETERS----------->UINT BackBufferWidth
+						|		<∴>
+						|
+						|------->UINT BackBufferHeight
+						|		<∴>
+						|
+						|------->D3DFORMAT BackBufferFormat
+						|		<∴>
+						|
+						|------->UINT BackBufferCount
+						|		<∴>
+						|
+						|------->D3DMULTISAMPLE_TYPE MultiSampleType
+						|		<∴>
+						|
+						|------->DWORD MultiSampleQuality
+						|		<∴>
+						|
+						|------->D3DSWAPEFFECT SwapEffect
+						|		<∴>
+						|
+						|------->HWND hDeviceWindow
+						|		<∴>
+						|
+						|------->BOOL Windowed
+						|		<∴>
+						|
+						|------->BOOL EnableAutoDepthStencil
+								<∴>
 */
