@@ -216,28 +216,31 @@ D3DCREATE--------------->D3DCREATE_FPU_PRESERVE
 
 <<<D3DPRESENT_PARAMETERS構造体>>>
 D3DPRESENT_PARAMETERS----------->UINT BackBufferWidth
-						|		<∴>
+						|		<∴>バックバッファの幅(ピクセル単位)。
 						|
 						|------->UINT BackBufferHeight
-						|		<∴>
+						|		<∴>バックバッファの幅\高さ(ピクセル単位)。
 						|
 						|------->D3DFORMAT BackBufferFormat
-						|		<∴>
+						|		<∴>バックバッファのフォーマット。「D3DFORMAT列挙型」で指定。
 						|
 						|------->UINT BackBufferCount
-						|		<∴>
+						|		<∴>バックバッファの数。「0」「1」「2」「3」が有効値、「0」は「1」と同義。
 						|
 						|------->D3DMULTISAMPLE_TYPE MultiSampleType
-						|		<∴>
+						|		<∴>マルチサンプリングの種類。「D3DMULTISAMPLE_TYPE列挙型」で指定。
+						|			マルチサンプリングを行わない場合は、「D3DMULTISAMPLE_NONE」を指定。
 						|
 						|------->DWORD MultiSampleQuality
-						|		<∴>
+						|		<∴>マルチサンプリングの品質。
+						|			「0」から「IDirect3D9::CheckDeviceMultiSampleTypeメソッド」で使う
+						|			「pQualityLevels」に返される値から-1した値までが有効。
 						|
 						|------->D3DSWAPEFFECT SwapEffect
-						|		<∴>
+						|		<∴>スワップエフェクトの種類。「D3DSWAPEFFECT列挙型」で指定。
 						|
 						|------->HWND hDeviceWindow
-						|		<∴>
+						|		<∴>デバイスに関連付けられているウィンドウのハンドル。
 						|
 						|------->BOOL Windowed
 						|		<∴>
