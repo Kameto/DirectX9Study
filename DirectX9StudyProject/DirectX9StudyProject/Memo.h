@@ -243,8 +243,24 @@ D3DPRESENT_PARAMETERS----------->UINT BackBufferWidth
 						|		<∴>デバイスに関連付けられているウィンドウのハンドル。
 						|
 						|------->BOOL Windowed
-						|		<∴>
+						|		<∴>画面モード。TRUEでウィンドウモード。FALSEでフルスクリーン。
 						|
 						|------->BOOL EnableAutoDepthStencil
-								<∴>
+						|		<∴>深度/ステンシルバッファの有無。TRUEを指定する場合、
+						|			「AutoDepthStencilFormat」メンバも設定する。
+						|
+						|------->D3DFORMAT AutoDepthStencilFormat
+						|		<∴>深度/ステンシルバッファのフォーマット。「D3DFORMAT」列挙型で指定。
+						|
+						|------->DWORD Flags
+						|		<∴>デバイスの動作設定。「D3DPRESENTFLAG」フラグの値を指定。
+						|
+						|------->UINT FUllScreen_RefreshRateInHz
+						|		<∴>リフレッシュレート。ウィンドウモードでは「0」を指定。
+						|			フルスクリーンモードでは「0」か「IDirect3D9::EnumAdapterModes」メソッドで
+						|			返されるリフレッシュモードを指定。
+						|
+						|------->UINT PresentationInterval
+								<∴>リフレッシュレートと「IDirect3D9::Present」メソッドの処理を
+									実行するレートの関係。
 */
