@@ -1,6 +1,4 @@
 #include <atlstr.h>
-#include <d3d9.h>
-#include <d3dx9.h>
 #include <string>
 #include <Windows.h>
 
@@ -8,9 +6,9 @@
 
 HWND hwnd;
 HINSTANCE hinst;
-LPCSTR clsname = "WindName";
+LPCSTR clsname = "test";
 
-LRESULT CALLBACK WinProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
+inline LRESULT CALLBACK WinProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	switch (msg)
 	{
@@ -25,63 +23,63 @@ LRESULT CALLBACK WinProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 	return DefWindowProc(hwnd, msg, wp, lp);
 }
 
-WNDCLASS SetWndClass(WNDCLASS _wc, WNDPROC _WinProc, HINSTANCE hInstance)
+inline WNDCLASS SetWndClass(WNDPROC _WinProc, HINSTANCE hInstance, LPCSTR wndName)
 {
-	WNDCLASS wc = _wc;
+	WNDCLASS wc = { NULL };
 	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc = _WinProc;
+	wc.lpfnWndProc = WinProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = hInstance;
+	wc.hCursor = NULL;
 	wc.hIcon = NULL;
-	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 	wc.lpszClassName = clsname;
 	wc.lpszMenuName = NULL;
 	return wc;
 }
 
-HWND NewWind(LPCTSTR classname, LPCTSTR windname, int x, int y, int hei, int wid, HINSTANCE hinst)
+inline HWND NewCreateWindow(LPCTSTR _classname, LPCTSTR wind_name, int _x, int _y, int _height, int _width, HINSTANCE _hinst)
 {
-	return CreateWindowA
-	(
-		classname,
-		windname,
+	return CreateWindowA(
+		_classname,
+		wind_name,
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_SYSMENU | WS_CAPTION | WS_MINIMIZEBOX,
-		x,
-		y,
-		wid,
-		hei,
+		_x,
+		_y,
+		_width,
+		_height,
 		NULL,
 		NULL,
-		hinst,
+		_hinst,
 		NULL
 	);
 }
 
 int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,_In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
-	WNDCLASS wc = { NULL };
-	MSG msg = { NULL };
-	int loopCheck = 0;
+	
+	WNDCLASS wc		 = { NULL };
+	MSG msg			 = { NULL };
 
 	// ウィンドウクラス生成
-	wc = SetWndClass(wc,WinProc, hInstance);
-	if (!RegisterClass(&wc))
+	wc = SetWndClass(WinProc, hInstance, clsname);
+	if (!Error::Check(&wc))
 	{
 		MessageBox(NULL, "ウィンドウクラス登録失敗", NULL, MB_OK);
 		return -1;
 	}
 
 	// ウィンドウ生成
-	hwnd = NewWind("Direct3D", "Direct3D", 100, 100, 540, 960, hinst);
-	if (hwnd == NULL)
+	hwnd = NewCreateWindow("test","Direct3D", 100, 100, HEIGHT, WIDTH, hInstance);
+	if (!Error::Check(hwnd))
 	{
 		MessageBox(NULL, "ウィンドウ作成失敗", NULL, MB_OK);
 		return -1;
 	}
 	
 	hinst = hInstance;
-	
+	int loopCheck = 0;
 	// メインループ
 	while (loopCheck = GetMessage(&msg, NULL, 0, 0))
 	{
